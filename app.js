@@ -5,18 +5,18 @@ const mqtt = require("mqtt");
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-const clients = new Set();
+const socketServer = new WebSocket.Server({ server });
+const socketClientList = new Set();
 const mqttClient = mqtt.connect("mqtt://broker.emqx.io");
 
-wss.on('connection', (ws, req) => {
+socketServer.on('connection', (socketClient, req) => {
     console.log('Client connected');
-    clients.add(ws);
+    socketClientList.add(socketClient);
 
     broadcast('Welcome to the server!');
 
     // Handle messages from clients
-    ws.on('message', (message) => {
+    socketClient.on('message', (message) => {
         const string = message.toString('utf-8');
         console.log(`Received: ${string}`);
         // Broadcast the message to all clients
@@ -36,7 +36,7 @@ wss.on('connection', (ws, req) => {
     });
 
     // Handle disconnection
-    ws.on('close', () => {
+    socketClient.on('close', () => {
         console.log('Client disconnected');
     });
 });
@@ -63,7 +63,7 @@ mqttClient.on("message", (topic, message) => {
 });
 
 function broadcast(message) {
-    clients.forEach((client) => {
+    socketClientList.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(message);
         }

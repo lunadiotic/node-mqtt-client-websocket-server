@@ -1,0 +1,33 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>WebSocket Test</title>
+	</head>
+	<body>
+		<input type="text" id="messageInput" placeholder="Type a message..." />
+		<button onclick="sendMessage()">Send</button>
+		<ul
+			style="display: flex; flex-wrap: wrap; gap: 10px; list-style: none"
+			id="messagesList"
+		></ul>
+
+		<script>
+			const socket = new WebSocket('ws://localhost:3000/'); // Sesuaikan dengan alamat WebSocket server Anda
+
+			socket.addEventListener('message', (event) => {
+				console.log(event);
+				const messagesList = document.getElementById('messagesList');
+				const li = document.createElement('li');
+				li.textContent = event.data;
+				messagesList.appendChild(li);
+			});
+
+			socket.addEventListener('open', (event) => {
+				console.log('Connected to WebSocket server');
+			});
+		</script>
+	</body>
+</html>
